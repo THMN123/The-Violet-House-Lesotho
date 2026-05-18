@@ -10,8 +10,20 @@
 }
 
 @layer base {
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-charcoal text-white font-sans antialiased;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  #root {
+    width: 100%;
+    overflow-x: hidden;
   }
   h1, h2, h3, h4 {
     @apply font-serif;
