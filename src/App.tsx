@@ -120,7 +120,7 @@ export default function App() {
     e.preventDefault();
     const addOnsList = [];
     if (bookingForm.addOns.jacuzzi) addOnsList.push("Private Jacuzzi tub");
-    if (bookingForm.addOns.pool) addOnsList.push("Heated Infinity Pool access");
+    if (bookingForm.addOns.pool) addOnsList.push("Infinity Pool access");
     if (bookingForm.addOns.catering) addOnsList.push("Gourmet Catering");
     if (bookingForm.addOns.eventSpace) addOnsList.push("Sanctuary Event Space");
 
@@ -355,7 +355,7 @@ Please let me know availability and details. Thank you!`;
               </h2>
               
               <p className="text-white/50 leading-relaxed mb-16 text-lg font-light max-w-lg">
-                Immerse yourself in a world where time slows down. Our heated pool and private wellness sanctuary are designed for those who appreciate the finer nuances of relaxation.
+                Immerse yourself in a world where time slows down. Our pristine infinity pool and private wellness sanctuary are designed for those who appreciate the finer nuances of relaxation.
               </p>
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-12">
@@ -363,8 +363,8 @@ Please let me know availability and details. Thank you!`;
                   <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-violet-royal mb-6 border border-white/10 group-hover:bg-violet-royal group-hover:text-white transition-all duration-500">
                     <Waves size={24} strokeWidth={1} />
                   </div>
-                  <h4 className="text-xs font-bold tracking-[0.2em] uppercase mb-3">Heated Infinity Pool</h4>
-                  <p className="text-[10px] tracking-widest text-white/30 uppercase">Temperature Controlled</p>
+                  <h4 className="text-xs font-bold tracking-[0.2em] uppercase mb-3">Infinity Pool</h4>
+                  <p className="text-[10px] tracking-widest text-white/30 uppercase">Tranquil & Serene</p>
                 </div>
                 <div className="group">
                   <div className="w-14 h-14 bg-white/5 rounded-full flex items-center justify-center text-violet-royal mb-6 border border-white/10 group-hover:bg-violet-royal group-hover:text-white transition-all duration-500">
@@ -557,7 +557,7 @@ Please let me know availability and details. Thank you!`;
                     <div className="px-4 text-center max-w-2xl mx-auto">
                       <h3 className="text-3xl font-serif font-light mb-4">Bespoke Birthday Celebrations</h3>
                       <p className="text-white/40 text-sm font-light leading-relaxed">
-                        Toast to life alongside our heated infinity pool, blending tranquil water reflections with first-class social vibes.
+                        Toast to life alongside our pristine infinity pool, blending tranquil water reflections with first-class social vibes.
                       </p>
                     </div>
                   </div>
@@ -984,7 +984,7 @@ Please let me know availability and details. Thank you!`;
               { icon: <Utensils strokeWidth={1} />, label: "Gourmet Dining", desc: "Bespoke culinary" },
               { icon: <Coffee strokeWidth={1} />, label: "Premium Coffee", desc: "Artisanal blends" },
               { icon: <Bath strokeWidth={1} />, label: "Private Jacuzzi tub", desc: "Hydrotherapy & Relax" },
-              { icon: <Waves strokeWidth={1} />, label: "Heated Pool", desc: "Year-round leisure" },
+              { icon: <Waves strokeWidth={1} />, label: "Infinity Pool", desc: "Pristine & serene" },
             ].map((item, i) => (
               <div key={i} className="bg-[#0a0a0a] p-12 flex flex-col items-center text-center group hover:bg-violet-royal/5 transition-colors duration-700">
                 <div className="text-violet-royal mb-8 transform group-hover:scale-110 transition-transform duration-500">{item.icon}</div>
@@ -1239,7 +1239,7 @@ Please let me know availability and details. Thank you!`;
                   <div className="space-y-3">
                     {[
                       { key: 'jacuzzi', label: 'Private Jacuzzi tub access' },
-                      { key: 'pool', label: 'Heated Infinity Pool session' },
+                      { key: 'pool', label: 'Infinity Pool access' },
                       { key: 'catering', label: 'In-suite Gourmet Catering' },
                       { key: 'eventSpace', label: 'Sanctuary Event Space' }
                     ].map((addon) => (
