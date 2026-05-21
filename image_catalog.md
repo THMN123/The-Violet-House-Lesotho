@@ -20,7 +20,7 @@ The following table summarizes the file-to-section mapping of the design:
 | **`image_7.png`** | [Events](#events) | Elegant corporate group setup or dinner configuration | `rounded-[3rem]`, right-hand column top item | 412 |
 | **`image_8.png`** | [Events](#events) | Intimate dining table featuring desserts and fine wine bottles | `rounded-[3rem]`, right-hand column bottom item | 421 |
 | **`image_9.png`** | [Events](#events) | High-end outdoor event setting or estate exterior | Large promo background block, landscape view under Legacy events | 444 |
-| **`image_10.png`** | [Hero](#) / SEO Metadata | Pool deck lifestyle, luxury structure outline, and mountain vibe | `h-screen` background, linear gradient overlay / `og:image` / `twitter:image` | 174 |
+| **`new.jpeg`** | [Hero](#) / SEO Metadata | Bright, sunny pool deck scene (fullscreen cover background) | Fullscreen `w-full h-full object-cover` scale-105 slow-zoom backdrop / `og:image` / `twitter:image` | 234 |
 | **`image_11.png`** | [Wellness](#wellness) | Close-up portrait of pristine pool waters | `aspect-[3/5]`, portrait-rounded card, overlapping layout | 253 |
 | **`image_12.png`** | [Wellness](#wellness) | Model enjoying the serene infinity pool deck | `aspect-[3/5]`, portrait-rounded card, overlapping layout | 262 |
 
@@ -128,21 +128,21 @@ The following table summarizes the file-to-section mapping of the design:
   ```
 * **UX Purpose:** Serves as the background for the promotional prompt call-to-action ("Host Your Legacy Event"). It triggers a booking modal preset specifically configured for events.
 
-#### 11. `image_10.png` — Hero Poolside Vibe & Social Card Banner
-* **Filename:** `/images/image_10.png`
-* **Visual Profile:** High-end landscape view of the pool deck, ambient lighting, luxury sun loungers, and mountain twilight skies.
-* **Section Location:** Hero Section background / HTML Social Head Tags.
+#### 11. `new.jpeg` — Fullscreen Background & Social Card Banner
+* **Filename:** `/images/new.jpeg`
+* **Visual Profile:** Bright, sunny pool deck scene, showcasing quiet luxury and modern lifestyle design.
+* **Section Location:** Hero Section fullscreen background / HTML Social Head Tags.
 * **HTML Element & Meta Tags:**
-  * In `App.tsx` (Hero Background):
+  * In `App.tsx` (Hero Fullscreen Cover Background):
     ```tsx
-    <img src="/images/image_10.png" alt="Luxury Lifestyle at The Violet House" className="w-full h-full object-cover opacity-50 scale-105 animate-slow-zoom" referrerPolicy="no-referrer" />
+    <img src="/images/new.jpeg" alt="Luxury Lifestyle at The Violet House" className="w-full h-full object-cover opacity-50 scale-105 animate-slow-zoom" referrerPolicy="no-referrer" />
     ```
   * In `index.html` (Open Graph & Twitter Share Cards):
     ```html
-    <meta property="og:image" content="/images/image_10.png" />
-    <meta property="twitter:image" content="/images/image_10.png" />
+    <meta property="og:image" content="/images/new.jpeg" />
+    <meta property="twitter:image" content="/images/new.jpeg" />
     ```
-* **UX Purpose:** The primary welcome visual representing the pinnacle of Maseru's luxury. Shows the primary infinity pool asset immediately. Also generates a premium preview when shared.
+* **UX Purpose:** Serves as the primary fullscreen background welcome visual. It uses a fullscreen single-centered backdrop layout with a slow-zoom animation (`animate-slow-zoom`) and dark gradients, providing a premium first impression and perfect integration with the centered header typography.
 
 #### 12. `image_11.png` — Pristine Pool Water Texture
 * **Filename:** `/images/image_11.png`

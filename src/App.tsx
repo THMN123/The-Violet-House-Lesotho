@@ -228,10 +228,11 @@ Please let me know availability and details. Thank you!`;
       </nav>
 
       {/* Hero Section */}
+      {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="/images/image_10.png" 
+            src="/images/new.jpeg" 
             alt="Luxury Lifestyle at The Violet House" 
             className="w-full h-full object-cover opacity-50 scale-105 animate-slow-zoom"
             referrerPolicy="no-referrer"
