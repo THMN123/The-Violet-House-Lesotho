@@ -156,7 +156,7 @@ The following table summarizes the file-to-section mapping of the design:
 
 #### 13. `image_12.png` — Serene Wellness Lifestyle
 * **Filename:** `/images/image_12.png`
-* **Visual Profile:** Portrait shot of a relaxed model sitting adjacent to the quiet luxury infinity pool deck.
+* **Visual Profile:** Portrait shot of a relaxed model sitting adjacent to the quiet luxury pool deck.
 * **Section Location:** Wellness & Relax Section (`#wellness`) — Right overlapping panel.
 * **HTML Element:**
   ```tsx
