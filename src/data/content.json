@@ -68,7 +68,12 @@
         "category": "Master Accommodation",
         "image": "/images/image_2.png",
         "description": "High-contrast geometric textures paired with ultra-premium linens. Experience regal solitude framed by panoramic views of the Lesotho hills.",
-        "specs": ["King Pillowtop Bed", "En-suite Jacuzzi", "Private Balcony", "Air Conditioning"]
+        "specs": [
+          "King Pillowtop Bed",
+          "En-suite Jacuzzi",
+          "Private Balcony",
+          "Air Conditioning"
+        ]
       },
       {
         "id": "lounge",
@@ -77,7 +82,12 @@
         "category": "Living & Reception",
         "image": "/images/image_1.png",
         "description": "Spacious entertainment salon fitted with designer lounge chairs, soft ambient LED illumination, and bespoke refreshment cabinetry.",
-        "specs": ["Bespoke Lounge Seating", "Smart Entertainment", "Hospitality Bar", "Ambient Hearth"]
+        "specs": [
+          "Bespoke Lounge Seating",
+          "Smart Entertainment",
+          "Hospitality Bar",
+          "Ambient Hearth"
+        ]
       }
     ]
   },

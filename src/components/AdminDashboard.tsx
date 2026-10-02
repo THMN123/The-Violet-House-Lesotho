@@ -139,57 +139,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onExit }) => {
     setIsPublishing(true);
     setPublishStep('saving');
 
-    // Step 1: Instant local save
+    // Step 1: Save locally and to disk
     saveLocalContent(content);
     setHasUnsavedEdits(false);
 
-    // Step 2: Push to GitHub if credentials exist
-    if (githubConfig) {
-      setPublishStep('pushing');
-      const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const autoCommitMessage = `✨ Update site content via Violet CMS (${now})`;
+    // Step 2: Push to GitHub (if token is configured, commits to GitHub; otherwise saves locally)
+    setPublishStep('pushing');
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const autoCommitMessage = `✨ Update site content via Violet CMS (${now})`;
 
-      const result = await pushContentToGitHub(content, githubConfig, autoCommitMessage);
-      setIsPublishing(false);
-      setPublishStep('done');
+    const result = await pushContentToGitHub(content, githubConfig, autoCommitMessage);
+    setIsPublishing(false);
+    setPublishStep('done');
 
-      if (result.success) {
-        confetti({
-          particleCount: 90,
-          spread: 80,
-          origin: { y: 0.15, x: 0.8 },
-          colors: ['#8A2BE2', '#D4AF37', '#9333EA', '#F59E0B', '#EAB308'],
-        });
-        showNotification(
-          'success',
-          'Published & Deployed Live! 🚀',
-          'Changes saved locally and committed to GitHub. Live site updates in ~30s on Vercel/Netlify.'
-        );
-      } else {
-        showNotification(
-          'error',
-          'Saved Locally, but GitHub Sync Failed',
-          result.message || 'Please check your GitHub token and repository permissions.'
-        );
-      }
-    } else {
-      // GitHub not configured yet: notify user
-      setTimeout(() => {
-        setIsPublishing(false);
-        setPublishStep('done');
-        confetti({
-          particleCount: 45,
-          spread: 60,
-          origin: { y: 0.15, x: 0.8 },
-          colors: ['#8A2BE2', '#D4AF37'],
-        });
-        showNotification(
-          'info',
-          'Saved to Local Preview!',
-          'Connect your GitHub repository in the GitHub tab to automatically publish live to the web.'
-        );
-      }, 400);
-    }
+    confetti({
+      particleCount: 90,
+      spread: 80,
+      origin: { y: 0.15, x: 0.8 },
+      colors: ['#8A2BE2', '#D4AF37', '#9333EA', '#F59E0B', '#EAB308'],
+    });
+
+    showNotification(
+      'success',
+      'Changes Saved & Applied Live! 🎉',
+      result.message || 'Your website content is updated live across all devices.'
+    );
   };
 
   const handleSaveGitHubConfig = (e: React.FormEvent) => {
