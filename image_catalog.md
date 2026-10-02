@@ -10,6 +10,7 @@ The following table summarizes the file-to-section mapping of the design:
 
 | Filename | Page Section / Target | Content Description | Aspect Ratio & UI Styling | TSX Line |
 | :--- | :--- | :--- | :--- | :---: |
+| **`logo.png`** | [Navigation](#), [Hero](#), [Footer](#), Modal, Favicon | Official luxury brand crest: gold circular emblem with house gables, rabbit silhouette in grass, leaves, and 'The VIOLET HOUSE Bed & Breakfast' on royal violet | Circular & rounded-square badge, gold border, violet glow | 158, 212, 280, 1105, 1120, 1225 |
 | **`image_0.png`** | [Location](#location) | Premium exterior of the estate showing Maseru's luxury residential styling | `aspect-square`, rounded corners, text overlay, zoom on hover | 567 |
 | **`image_1.png`** | [Suites](#suites) | Plush grey entertainment lounge with designer chairs | `aspect-square`, custom cards border shadow, zoom on hover | 360 |
 | **`image_2.png`** | [Suites](#suites) | Royal Suite featuring signature white checkered headboards | `aspect-square`, custom cards border shadow, zoom on hover | 334 |

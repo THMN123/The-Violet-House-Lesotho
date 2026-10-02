@@ -1,0 +1,164 @@
+{
+  "general": {
+    "siteName": "The Violet House",
+    "siteTagline": "Bed & Breakfast • Lesotho",
+    "logoUrl": "/images/logo.png",
+    "primaryColor": "#8A2BE2",
+    "secondaryColor": "#D4AF37",
+    "accentDark": "#4B0082",
+    "passcode": "1234"
+  },
+  "typography": {
+    "displayFont": "Playfair Display",
+    "bodyFont": "Plus Jakarta Sans"
+  },
+  "hero": {
+    "kicker": "The Pinnacle of Maseru",
+    "headlineMain": "Elegance",
+    "headlineItalic": "Perfected.",
+    "bgImageUrl": "/images/new.jpeg",
+    "primaryButtonText": "Reserve Your Experience",
+    "secondaryButtonText": "Discover The Sanctuary",
+    "secondaryButtonLink": "#wellness"
+  },
+  "wellness": {
+    "kicker": "Wellness & Relaxation",
+    "headlineMain": "Immerse in",
+    "headlineItalic": "Total Serenity.",
+    "description": "Experience tranquil bliss with our private Jacuzzi tubs, sparkling swimming pool, and rejuvenating sanctuary ambiance designed for pure restorative peace.",
+    "poolImage": "/images/image_11.png",
+    "modelImage": "/images/image_12.png",
+    "amenities": [
+      {
+        "id": "amenity-1",
+        "title": "Private Jacuzzi Tubs",
+        "desc": "Custom hydrotherapy jets in complete private seclusion",
+        "icon": "Bath"
+      },
+      {
+        "id": "amenity-2",
+        "title": "Heated Pool Deck",
+        "desc": "Sun-drenched loungers and crystal clear infinity waters",
+        "icon": "Waves"
+      },
+      {
+        "id": "amenity-3",
+        "title": "Fast Fiber Wi-Fi",
+        "desc": "High-speed seamless connectivity throughout the estate",
+        "icon": "Wifi"
+      },
+      {
+        "id": "amenity-4",
+        "title": "Secure Estate Parking",
+        "desc": "Gated access with 24/7 dedicated surveillance",
+        "icon": "Car"
+      }
+    ]
+  },
+  "suites": {
+    "kicker": "Accommodation",
+    "headlineMain": "The Living &",
+    "headlineItalic": "Suite Catalog.",
+    "description": "Each space is sculpted to elevate comfort into an art form, blending modern architectural flair with warm Lesotho touches.",
+    "items": [
+      {
+        "id": "royal-suite",
+        "title": "The Royal Bedroom Suite",
+        "subtitle": "Signature White Checkered Headboard Design",
+        "category": "Master Accommodation",
+        "image": "/images/image_2.png",
+        "description": "High-contrast geometric textures paired with ultra-premium linens. Experience regal solitude framed by panoramic views of the Lesotho hills.",
+        "specs": ["King Pillowtop Bed", "En-suite Jacuzzi", "Private Balcony", "Air Conditioning"]
+      },
+      {
+        "id": "lounge",
+        "title": "The Contemporary Living Lounge",
+        "subtitle": "Curated Grey Minimalist Architecture",
+        "category": "Living & Reception",
+        "image": "/images/image_1.png",
+        "description": "Spacious entertainment salon fitted with designer lounge chairs, soft ambient LED illumination, and bespoke refreshment cabinetry.",
+        "specs": ["Bespoke Lounge Seating", "Smart Entertainment", "Hospitality Bar", "Ambient Hearth"]
+      }
+    ]
+  },
+  "dining": {
+    "kicker": "Gastronomical Sanctuary",
+    "headlineMain": "The Gourmet",
+    "headlineItalic": "Dining Experience.",
+    "description": "A course-by-course deep dive into our elite private chef services, presenting culinary craft as a fine art form.",
+    "courses": [
+      {
+        "id": "starters",
+        "name": "Starters",
+        "title": "Vibrant Beginnings",
+        "subtitle": "Course 01 — Starters & Appetizers",
+        "desc": "Awaken your palate with delicate compositions. From rich, velvety roasted vegetable purees to intricately dressed corn arrangements, our starters frame the dinner with absolute sensory clarity.",
+        "image": "/images/image_6.png",
+        "highlights": [
+          "Golden Harvest Cream Soup",
+          "Roasted Corn & Sweet Herb Medley",
+          "Hand-finished Herb Accents"
+        ]
+      },
+      {
+        "id": "seafood",
+        "name": "Seafood",
+        "title": "Oceanic Purity",
+        "subtitle": "Course 02 — Entrées & Seafood",
+        "desc": "Savor precision-seared salmon served on vibrant purées, celebrating fresh seafood through minimalist culinary design. Each dish offers a perfect balance of crispy texture and delicate flavor.",
+        "image": "/images/WhatsApp Image 2026-05-17 at 17.36.56.jpeg",
+        "highlights": [
+          "Atlantic Salmon over Carrot-Ginger Velvet",
+          "Seared Sea Trout with Fresh Micro-sprouts",
+          "House Zesty Citrus reduction glaze"
+        ]
+      },
+      {
+        "id": "mains",
+        "name": "Mains",
+        "title": "Signature Masterpieces",
+        "subtitle": "Course 03 — Signature Mains",
+        "desc": "Our main entrées unite prime cuts with bespoke culinary reductions. Prepared to succulent perfection with seasonal organic produce from local mountain farmlands.",
+        "image": "/images/WhatsApp Image 2026-05-17 at 17.37.24.jpeg",
+        "highlights": [
+          "Pan-seared Gourmet Medallions",
+          "Slow-braised Herb Beef Rib",
+          "Garden Harvest Puree & Charred Leeks"
+        ]
+      },
+      {
+        "id": "desserts",
+        "name": "Desserts",
+        "title": "Sweet Artistry",
+        "subtitle": "Course 04 — Decadent Desserts",
+        "desc": "Conclude your gourmet voyage with artisan pastries, velvety ganache, and curated wine pairings that provide a sweet, enduring climax to your evening.",
+        "image": "/images/image_8.png",
+        "highlights": [
+          "Artisan Berry Velvet Tarts",
+          "Decadent Chocolate Ganache Mousse",
+          "Vintage Cellar Wine Pairing"
+        ]
+      }
+    ]
+  },
+  "events": {
+    "kicker": "Sanctuary Hosting",
+    "headlineMain": "Host Your",
+    "headlineItalic": "Legacy Event.",
+    "description": "From intimate soirées to high-profile corporate retreats, we provide the canvas for your most memorable stories.",
+    "image": "/images/image_9.png",
+    "diningImage": "/images/image_3.png",
+    "detailImage": "/images/image_5.png"
+  },
+  "contact": {
+    "phone": "+266 6236 9487",
+    "whatsapp": "26662369487",
+    "email": "theviolethouseles@gmail.com",
+    "address": "Thetsane, Maseru, Lesotho",
+    "instagram": "https://www.instagram.com/theviolethouse.ls",
+    "facebook": "https://facebook.com",
+    "estateImage": "/images/image_0.png",
+    "signageImage": "/images/image_4.png",
+    "quote": "A sanctuary where every detail is a testament to the art of refined living."
+  }
+}
