@@ -1495,23 +1495,31 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onExit }) => {
             </div>
 
             {/* Quick 1-Click Link to Generate Token */}
-            <div className="p-4 rounded-2xl bg-violet-950/30 border border-violet-500/30 space-y-2.5">
-              <div className="text-xs font-semibold text-violet-200 flex items-center gap-1.5">
-                <Key size={14} className="text-violet-400" />
-                <span>Get your 1-time token (takes 10 seconds)</span>
+            <div className="p-4 rounded-2xl bg-violet-950/30 border border-violet-500/30 space-y-3">
+              <div className="text-xs font-semibold text-violet-200 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Key size={14} className="text-violet-400" />
+                  <span>Use: <strong>Personal Access Token (Classic)</strong></span>
+                </div>
+                <span className="text-[10px] bg-violet-800/50 text-violet-200 px-2 py-0.5 rounded-full border border-violet-500/30">Starts with ghp_</span>
               </div>
               <p className="text-[11px] text-zinc-400 leading-relaxed">
-                Click below to open GitHub with the exact permissions pre-selected. Click the green <strong className="text-zinc-200">"Generate token"</strong> button at the bottom of that page and paste the code below:
+                Click the button below to open GitHub with the <code className="text-violet-300 bg-violet-950/60 px-1.5 py-0.5 rounded border border-violet-500/30">repo</code> scope already pre-checked. Scroll to the bottom, click the green <strong className="text-zinc-200">"Generate token"</strong> button, copy it, and paste it here:
               </p>
-              <a
-                href="https://github.com/settings/tokens/new?description=Violet+House+CMS&scopes=repo"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-xs font-semibold text-white shadow-sm transition-all"
-              >
-                <span>Generate Token on GitHub</span>
-                <ExternalLink size={13} />
-              </a>
+              <div className="flex flex-wrap gap-2 items-center">
+                <a
+                  href="https://github.com/settings/tokens/new?description=The+Violet+House+CMS&scopes=repo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-xs font-semibold text-white shadow-sm transition-all"
+                >
+                  <span>1. Click Here to Open Pre-Configured Token</span>
+                  <ExternalLink size={13} />
+                </a>
+              </div>
+              <div className="text-[10px] text-zinc-500 pt-1">
+                Required Permission: <strong>repo</strong> (Full control of private repositories) • Expiration: <strong>No expiration</strong> (or 90 days).
+              </div>
             </div>
 
             {/* Token Input Form */}
