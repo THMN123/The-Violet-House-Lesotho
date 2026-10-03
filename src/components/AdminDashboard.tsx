@@ -163,7 +163,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onExit }) => {
     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const autoCommitMessage = `✨ Update site content via Violet CMS (${now})`;
 
-    const result = await pushContentToGitHub(content, githubConfig || { token: '', repo: 'thaanemoletsane/The-Violet-House-Lesotho', branch: 'main' }, autoCommitMessage);
+    const result = await pushContentToGitHub(content, githubConfig || getGitHubConfig(), autoCommitMessage);
     setIsPublishing(false);
     setPublishStep('done');
 

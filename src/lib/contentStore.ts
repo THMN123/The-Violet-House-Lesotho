@@ -105,11 +105,12 @@ export function resetLocalContent(): void {
   window.dispatchEvent(new Event('contentUpdated'));
 }
 
-const DEFAULT_REPO = 'thaanemoletsane/The-Violet-House-Lesotho';
+const DEFAULT_REPO = (import.meta.env?.VITE_GITHUB_REPO as string) || 'THMN123/The-Violet-House-Lesotho';
+const DEFAULT_TOKEN = (import.meta.env?.VITE_GITHUB_TOKEN as string) || '';
 
 export function getGitHubConfig(): GitHubConfig {
   const fallback: GitHubConfig = {
-    token: '',
+    token: DEFAULT_TOKEN,
     repo: DEFAULT_REPO,
     branch: 'main',
   };
@@ -119,7 +120,7 @@ export function getGitHubConfig(): GitHubConfig {
     if (data) {
       const parsed = JSON.parse(data);
       return {
-        token: parsed.token || '',
+        token: parsed.token || DEFAULT_TOKEN,
         repo: parsed.repo || DEFAULT_REPO,
         branch: parsed.branch || 'main',
       };
@@ -152,10 +153,12 @@ export async function pushContentToGitHub(
   // 1. Always save to localStorage and server filesystem immediately
   saveLocalContent(content);
 
-  const { token, repo, branch = 'main' } = config;
+  const token = (config?.token || DEFAULT_TOKEN).trim();
+  const rawRepo = (config?.repo || DEFAULT_REPO).trim();
+  const branch = config?.branch || 'main';
 
-  // 2. If token is not provided, inform clearly that it's saved locally/on server, but needs token for GitHub global deploy
-  if (!token || !token.trim()) {
+  // 2. If token is not provided, inform clearly that it's saved locally/on server
+  if (!token) {
     return {
       success: true,
       isLocalSaved: true,
@@ -164,7 +167,7 @@ export async function pushContentToGitHub(
     };
   }
 
-  const cleanRepo = repo.replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '').trim();
+  const cleanRepo = rawRepo.replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '').trim();
   const filePath = 'src/data/content.json';
   const apiUrl = `https://api.github.com/repos/${cleanRepo}/contents/${filePath}?ref=${encodeURIComponent(branch)}`;
 
