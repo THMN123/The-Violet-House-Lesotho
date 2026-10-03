@@ -268,22 +268,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onExit }) => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold tracking-wider uppercase text-zinc-100">
-                  Violet Studio
-                </span>
-                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-violet-950/80 text-violet-300 border border-violet-800/40 font-mono">
-                  PRO
+                  The Violet House
                 </span>
               </div>
               <div className="text-[10px] text-zinc-500 flex items-center gap-1.5">
                 {hasUnsavedEdits ? (
                   <span className="text-amber-400 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-                    Unsaved edits
+                    Unsaved changes
                   </span>
                 ) : (
-                  <span className="text-emerald-400 flex items-center gap-1">
+                  <span className="text-zinc-400 flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    In Sync
+                    Saved
                   </span>
                 )}
               </div>
@@ -461,21 +458,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onExit }) => {
 
             {/* Bottom Status Card */}
             <div className="pt-4 border-t border-zinc-800 space-y-3">
-              {/* Site Health Card */}
-              <div className="p-3.5 rounded-2xl bg-zinc-950 border border-zinc-800 text-[11px] space-y-2">
-                <div className="flex items-center justify-between text-zinc-300 font-medium">
-                  <span className="flex items-center gap-1.5">
-                    <Globe size={13} className="text-violet-400" />
-                    Site Readiness
-                  </span>
-                  <span className="text-emerald-400 font-mono text-[10px]">100% Ready</span>
+              <div className="px-3 py-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800/80 text-[11px] text-zinc-400">
+                <div className="flex items-center gap-1.5 text-zinc-300 font-medium mb-0.5">
+                  <FolderGit2 size={13} className="text-violet-400" />
+                  <span>Repository</span>
                 </div>
-                <div className="w-full h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                  <div className="w-full h-full bg-gradient-to-r from-violet-500 to-emerald-400 rounded-full" />
-                </div>
-                <div className="text-[10px] text-zinc-500 flex items-center justify-between">
-                  <span>Static JSON Engine</span>
-                  <span>Zero Database</span>
+                <div className="text-[10px] text-zinc-400 font-mono truncate">
+                  THMN123/The-Violet-House-Lesotho
                 </div>
               </div>
 
@@ -484,7 +473,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onExit }) => {
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
               >
                 <ChevronLeft size={16} />
-                <span>Return to Live Website</span>
+                <span>Return to Website</span>
               </button>
             </div>
           </div>
@@ -1480,17 +1469,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onExit }) => {
             </button>
 
             <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">
-                  Step 1: Saved to App Server &amp; Preview ✓
-                </span>
-              </div>
               <h3 className="text-xl font-semibold text-zinc-100">
-                Publish Globally to GitHub &amp; Vercel
+                GitHub Deployment
               </h3>
               <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                Your changes are already saved to this app server. To deploy globally to your public production website on GitHub and Vercel, connect your 1-time GitHub Personal Access Token.
+                Connect your personal access token to publish directly to <span className="font-mono text-zinc-200">THMN123/The-Violet-House-Lesotho</span>.
               </p>
             </div>
 
