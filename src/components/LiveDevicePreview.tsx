@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { SiteContent } from '../lib/contentStore';
-import { LandingPageView } from './LandingPageView';
 import {
   Smartphone,
   Tablet,
@@ -68,7 +67,7 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
   const [device, setDevice] = useState<DeviceMode>('mobile');
   const [zoomMode, setZoomMode] = useState<'fit' | '100%'>('fit');
   const containerRef = useRef<HTMLDivElement>(null);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
   // ResizeObserver to calculate auto-fit scale so device never gets cut off
@@ -88,25 +87,31 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
 
   const spec = DEVICE_SPECS[device];
 
-  // Dynamic Scale: device chassis always fits inside the container
+  // Dynamic Scale: device chassis always fits inside the container with margin
   const padding = 32;
   const availW = Math.max(containerSize.width - padding, 200);
   const availH = Math.max(containerSize.height - padding, 200);
   const fitScale = Math.min(availW / spec.chassisWidth, availH / spec.chassisHeight, 1);
   const activeScale = zoomMode === 'fit' ? Math.max(fitScale, 0.25) : 1;
 
-  const handleResetScroll = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+  // Sync content updates into the preview iframe via postMessage
+  useEffect(() => {
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type: 'VIOLET_CONTENT_UPDATE', content }, '*');
+    }
+  }, [content]);
+
+  const handleIframeLoad = () => {
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({ type: 'VIOLET_CONTENT_UPDATE', content }, '*');
     }
   };
 
-  // Reset scroll when switching device
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop = 0;
+  const handleResetScroll = () => {
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [device]);
+  };
 
   return (
     <div className="h-full flex flex-col bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
@@ -204,7 +209,7 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
         </div>
       </div>
 
-      {/* Viewport Canvas with Perfect Centering & Auto-fit Math */}
+      {/* Viewport Canvas with Centering & Auto-fit Math */}
       <div
         ref={containerRef}
         className="flex-1 bg-[#09090b] p-4 overflow-auto flex items-center justify-center select-none"
@@ -236,7 +241,7 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
                 <div className="absolute -left-[3px] top-62 w-[3px] h-14 bg-zinc-600 rounded-l-sm" />
                 <div className="absolute -right-[3px] top-36 w-[3px] h-20 bg-zinc-600 rounded-r-sm" />
 
-                {/* Inner Screen Bezel */}
+                {/* Inner Screen Bezel with isolated real mobile viewport */}
                 <div className="w-[390px] h-[844px] rounded-[40px] bg-black overflow-hidden flex flex-col relative select-text">
                   {/* Status Bar & Dynamic Island */}
                   <div className="h-11 bg-black w-full flex items-center justify-between px-7 pt-1 z-30 select-none flex-shrink-0">
@@ -253,15 +258,15 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
                     </div>
                   </div>
 
-                  {/* Scrollable Screen Viewport */}
-                  <div
-                    ref={scrollContainerRef}
-                    className="flex-1 w-full overflow-y-auto bg-charcoal text-white antialiased scrollbar-thin scrollbar-thumb-zinc-700"
-                  >
-                    <LandingPageView
-                      content={content}
-                      isPreview={true}
-                      forcedDevice="mobile"
+                  {/* Isolated Real 390px Mobile Viewport via Iframe */}
+                  <div className="flex-1 w-full overflow-hidden bg-charcoal">
+                    <iframe
+                      ref={iframeRef}
+                      key="mobile-preview-frame"
+                      src="/?preview=true"
+                      onLoad={handleIframeLoad}
+                      className="w-full h-full border-0 block bg-[#111113]"
+                      title="Mobile View"
                     />
                   </div>
 
@@ -287,15 +292,15 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
                     </div>
                   </div>
 
-                  {/* Scrollable Viewport */}
-                  <div
-                    ref={scrollContainerRef}
-                    className="flex-1 w-full overflow-y-auto bg-charcoal text-white antialiased scrollbar-thin scrollbar-thumb-zinc-700"
-                  >
-                    <LandingPageView
-                      content={content}
-                      isPreview={true}
-                      forcedDevice="tablet"
+                  {/* Isolated Real 768px Tablet Viewport via Iframe */}
+                  <div className="flex-1 w-full overflow-hidden bg-charcoal">
+                    <iframe
+                      ref={iframeRef}
+                      key="tablet-preview-frame"
+                      src="/?preview=true"
+                      onLoad={handleIframeLoad}
+                      className="w-full h-full border-0 block bg-[#111113]"
+                      title="Tablet View"
                     />
                   </div>
 
@@ -333,15 +338,15 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
                       </div>
                     </div>
 
-                    {/* Scrollable Viewport */}
-                    <div
-                      ref={scrollContainerRef}
-                      className="flex-1 w-full overflow-y-auto bg-charcoal text-white antialiased scrollbar-thin scrollbar-thumb-zinc-700"
-                    >
-                      <LandingPageView
-                        content={content}
-                        isPreview={true}
-                        forcedDevice="desktop"
+                    {/* Isolated Real 1280px Desktop Viewport via Iframe */}
+                    <div className="flex-1 w-full overflow-hidden bg-charcoal">
+                      <iframe
+                        ref={iframeRef}
+                        key="laptop-preview-frame"
+                        src="/?preview=true"
+                        onLoad={handleIframeLoad}
+                        className="w-full h-full border-0 block bg-[#111113]"
+                        title="Desktop View"
                       />
                     </div>
                   </div>

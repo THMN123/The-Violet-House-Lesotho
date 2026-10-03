@@ -43,13 +43,35 @@ export default function App() {
     };
   }, []);
 
-  // Listen to content updates
+  // Listen to content updates via custom event, localStorage storage event, or iframe postMessage
   React.useEffect(() => {
     const handleContentUpdate = () => {
       setContent(getLocalContent());
     };
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'violet_house_content_v2' && e.newValue) {
+        try {
+          setContent(JSON.parse(e.newValue));
+        } catch {}
+      }
+    };
+
+    const handleMessage = (e: MessageEvent) => {
+      if (e.data?.type === 'VIOLET_CONTENT_UPDATE' && e.data.content) {
+        setContent(e.data.content);
+      }
+    };
+
     window.addEventListener('contentUpdated', handleContentUpdate);
-    return () => window.removeEventListener('contentUpdated', handleContentUpdate);
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('contentUpdated', handleContentUpdate);
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('message', handleMessage);
+    };
   }, []);
 
   // Secret Multi-Tap Listener: 5 taps in 1.5 seconds on brand crest or footer
@@ -85,13 +107,15 @@ export default function App() {
     setIsAdminRoute(false);
   };
 
-  if (isAdminRoute) {
+  const isPreviewParam = typeof window !== 'undefined' && window.location.search.includes('preview=true');
+
+  if (isAdminRoute && !isPreviewParam) {
     return <AdminDashboard onExit={navigateToHome} />;
   }
 
   return (
     <>
-      <LandingPageView content={content} onSecretTap={handleSecretTap} />
+      <LandingPageView content={content} onSecretTap={handleSecretTap} isPreview={isPreviewParam} />
 
       {/* SECRET PASSCODE GATEWAY MODAL (Accessible via 5-tap on footer/logo or Ctrl+Shift+A) */}
       <SecretPasscodeModal
