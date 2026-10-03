@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { SiteContent } from '../lib/contentStore';
 import { LandingPageView } from './LandingPageView';
 import {
@@ -11,7 +10,6 @@ import {
   Wifi,
   Battery,
   Signal,
-  Maximize2,
 } from 'lucide-react';
 
 interface LiveDevicePreviewProps {
@@ -70,13 +68,10 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
   const [device, setDevice] = useState<DeviceMode>('mobile');
   const [zoomMode, setZoomMode] = useState<'fit' | '100%'>('fit');
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
-  // Iframe Portal Setup
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [mountNode, setMountNode] = useState<HTMLElement | null>(null);
-
-  // ResizeObserver to calculate auto-fit scale
+  // ResizeObserver to calculate auto-fit scale so device never gets cut off
   useEffect(() => {
     if (!containerRef.current) return;
     const observer = new ResizeObserver((entries) => {
@@ -93,78 +88,25 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
 
   const spec = DEVICE_SPECS[device];
 
-  // Calculate dynamic scale factor so device always fits available space with zero cutoff
+  // Dynamic Scale: device chassis always fits inside the container
   const padding = 32;
-  const availW = Math.max(containerSize.width - padding, 240);
-  const availH = Math.max(containerSize.height - padding, 240);
+  const availW = Math.max(containerSize.width - padding, 200);
+  const availH = Math.max(containerSize.height - padding, 200);
   const fitScale = Math.min(availW / spec.chassisWidth, availH / spec.chassisHeight, 1);
-  const activeScale = zoomMode === 'fit' ? Math.max(fitScale, 0.2) : 1;
-
-  // Sync styles into iframe document
-  const syncStylesToIframe = (doc: Document) => {
-    doc.head.innerHTML = `
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <base href="${window.location.origin}/" />
-      <style>
-        html, body {
-          margin: 0;
-          padding: 0;
-          background-color: #111113;
-          color: #f4f4f5;
-          font-family: 'Plus Jakarta Sans', sans-serif;
-          overflow-x: hidden;
-          scrollbar-width: thin;
-          scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-        }
-        ::-webkit-scrollbar {
-          width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-          background: rgba(255, 255, 255, 0.2);
-          border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: rgba(255, 255, 255, 0.35);
-        }
-      </style>
-    `;
-
-    // Clone all existing style and link tags from main document
-    document.querySelectorAll('style, link[rel="stylesheet"]').forEach((el) => {
-      doc.head.appendChild(el.cloneNode(true));
-    });
-
-    doc.documentElement.className = 'dark';
-    doc.body.className = 'bg-[#111113] text-zinc-100 m-0 p-0 antialiased overflow-x-hidden';
-  };
-
-  const handleIframeLoad = () => {
-    const doc = iframeRef.current?.contentDocument;
-    if (!doc) return;
-    syncStylesToIframe(doc);
-    setMountNode(doc.body);
-  };
-
-  // Keep styles synchronized if main document head changes
-  useEffect(() => {
-    const observer = new MutationObserver(() => {
-      if (iframeRef.current?.contentDocument) {
-        syncStylesToIframe(iframeRef.current.contentDocument);
-      }
-    });
-    observer.observe(document.head, { childList: true, subtree: true });
-    return () => observer.disconnect();
-  }, []);
+  const activeScale = zoomMode === 'fit' ? Math.max(fitScale, 0.25) : 1;
 
   const handleResetScroll = () => {
-    if (iframeRef.current?.contentWindow) {
-      iframeRef.current.contentWindow.scrollTo({ top: 0, behavior: 'smooth' });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
+
+  // Reset scroll when switching device
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, [device]);
 
   return (
     <div className="h-full flex flex-col bg-zinc-950 border border-zinc-800 rounded-3xl overflow-hidden shadow-2xl">
@@ -232,10 +174,10 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
             onClick={() => setZoomMode(zoomMode === 'fit' ? '100%' : 'fit')}
             className={`px-2.5 py-1.5 rounded-xl text-xs font-mono transition-colors ${
               zoomMode === 'fit'
-                ? 'bg-zinc-800 text-zinc-200'
+                ? 'bg-zinc-800 text-zinc-200 hover:text-white'
                 : 'bg-violet-950/50 text-violet-300 border border-violet-800/40'
             }`}
-            title={zoomMode === 'fit' ? 'Switch to actual 100% scale' : 'Switch to fit view'}
+            title={zoomMode === 'fit' ? 'Switch to actual 100% scale' : 'Switch to auto-fit view'}
           >
             {zoomMode === 'fit' ? 'Fit' : '100%'}
           </button>
@@ -295,7 +237,7 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
                 <div className="absolute -right-[3px] top-36 w-[3px] h-20 bg-zinc-600 rounded-r-sm" />
 
                 {/* Inner Screen Bezel */}
-                <div className="w-[390px] h-[844px] rounded-[40px] bg-black overflow-hidden flex flex-col relative">
+                <div className="w-[390px] h-[844px] rounded-[40px] bg-black overflow-hidden flex flex-col relative select-text">
                   {/* Status Bar & Dynamic Island */}
                   <div className="h-11 bg-black w-full flex items-center justify-between px-7 pt-1 z-30 select-none flex-shrink-0">
                     <span className="text-[12px] font-semibold text-white font-mono tracking-tight">9:41</span>
@@ -311,14 +253,15 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
                     </div>
                   </div>
 
-                  {/* Isolated Responsive Viewport (iframe with true 390px width) */}
-                  <div className="flex-1 w-full overflow-hidden bg-[#111113]">
-                    <iframe
-                      ref={iframeRef}
-                      key="mobile-preview"
-                      onLoad={handleIframeLoad}
-                      className="w-full h-full border-0 block"
-                      title="Mobile View"
+                  {/* Scrollable Screen Viewport */}
+                  <div
+                    ref={scrollContainerRef}
+                    className="flex-1 w-full overflow-y-auto bg-charcoal text-white antialiased scrollbar-thin scrollbar-thumb-zinc-700"
+                  >
+                    <LandingPageView
+                      content={content}
+                      isPreview={true}
+                      forcedDevice="mobile"
                     />
                   </div>
 
@@ -333,7 +276,7 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
             {/* ==================== 2. TABLET: IPAD AIR ==================== */}
             {device === 'tablet' && (
               <div className="relative w-[800px] h-[1056px] rounded-[36px] p-[16px] bg-gradient-to-b from-zinc-700 via-zinc-800 to-zinc-900 border border-zinc-600/70 shadow-[0_30px_90px_-15px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden ring-1 ring-white/10">
-                <div className="w-[768px] h-[1024px] rounded-[22px] bg-black overflow-hidden flex flex-col relative">
+                <div className="w-[768px] h-[1024px] rounded-[22px] bg-black overflow-hidden flex flex-col relative select-text">
                   {/* iPad Status Bar */}
                   <div className="h-7 bg-black w-full flex items-center justify-between px-6 pt-1 text-[11px] text-zinc-400 flex-shrink-0 select-none">
                     <span>9:41 AM</span>
@@ -344,14 +287,15 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
                     </div>
                   </div>
 
-                  {/* Isolated Responsive Viewport (iframe with true 768px width) */}
-                  <div className="flex-1 w-full overflow-hidden bg-[#111113]">
-                    <iframe
-                      ref={iframeRef}
-                      key="tablet-preview"
-                      onLoad={handleIframeLoad}
-                      className="w-full h-full border-0 block"
-                      title="Tablet View"
+                  {/* Scrollable Viewport */}
+                  <div
+                    ref={scrollContainerRef}
+                    className="flex-1 w-full overflow-y-auto bg-charcoal text-white antialiased scrollbar-thin scrollbar-thumb-zinc-700"
+                  >
+                    <LandingPageView
+                      content={content}
+                      isPreview={true}
+                      forcedDevice="tablet"
                     />
                   </div>
 
@@ -368,7 +312,7 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
               <div className="relative w-[1304px] h-[864px] flex flex-col items-center">
                 {/* Aluminum Display Lid */}
                 <div className="w-[1304px] h-[840px] rounded-t-2xl p-[12px] bg-gradient-to-b from-zinc-700 via-zinc-800 to-zinc-900 border border-zinc-600/80 shadow-[0_25px_80px_-10px_rgba(0,0,0,0.95)] flex flex-col overflow-hidden">
-                  <div className="w-[1280px] h-[816px] rounded-t-xl bg-black overflow-hidden flex flex-col relative border border-white/10">
+                  <div className="w-[1280px] h-[816px] rounded-t-xl bg-black overflow-hidden flex flex-col relative border border-white/10 select-text">
                     {/* Modern Browser Chrome Window Bar */}
                     <div className="h-9 bg-zinc-900 border-b border-zinc-800 px-4 flex items-center justify-between text-xs text-zinc-400 flex-shrink-0 select-none">
                       {/* Window Traffic Lights */}
@@ -389,14 +333,15 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
                       </div>
                     </div>
 
-                    {/* Isolated Responsive Viewport (iframe with true 1280px width) */}
-                    <div className="flex-1 w-full overflow-hidden bg-[#111113]">
-                      <iframe
-                        ref={iframeRef}
-                        key="laptop-preview"
-                        onLoad={handleIframeLoad}
-                        className="w-full h-full border-0 block"
-                        title="Desktop View"
+                    {/* Scrollable Viewport */}
+                    <div
+                      ref={scrollContainerRef}
+                      className="flex-1 w-full overflow-y-auto bg-charcoal text-white antialiased scrollbar-thin scrollbar-thumb-zinc-700"
+                    >
+                      <LandingPageView
+                        content={content}
+                        isPreview={true}
+                        forcedDevice="desktop"
                       />
                     </div>
                   </div>
@@ -411,13 +356,6 @@ export const LiveDevicePreview: React.FC<LiveDevicePreviewProps> = ({
           </div>
         </div>
       </div>
-
-      {/* Render Portal into Iframe Body when Document is Ready */}
-      {mountNode &&
-        createPortal(
-          <LandingPageView content={content} isPreview={true} />,
-          mountNode
-        )}
     </div>
   );
 };

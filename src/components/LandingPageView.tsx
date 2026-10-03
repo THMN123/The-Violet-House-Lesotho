@@ -25,13 +25,17 @@ interface LandingPageViewProps {
   content: SiteContent;
   onSecretTap?: () => void;
   isPreview?: boolean;
+  forcedDevice?: 'mobile' | 'tablet' | 'desktop';
 }
 
 export const LandingPageView: React.FC<LandingPageViewProps> = ({
   content,
   onSecretTap,
   isPreview = false,
+  forcedDevice,
 }) => {
+  const isMobileMode = forcedDevice === 'mobile';
+  const isTabletMode = forcedDevice === 'tablet';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   
@@ -211,7 +215,7 @@ Please let me know availability and details. Thank you!`;
           </div>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-12">
+          <div className={`${isMobileMode ? 'hidden' : 'hidden md:flex'} items-center gap-8 lg:gap-12`}>
             {navLinks.map((link) => (
               <a 
                 key={link.name} 
@@ -232,7 +236,7 @@ Please let me know availability and details. Thank you!`;
 
           {/* Mobile Menu Toggle */}
           <button 
-            className="md:hidden p-2 text-white flex-shrink-0 cursor-pointer"
+            className={`${isMobileMode ? 'block' : 'md:hidden'} p-2 text-white flex-shrink-0 cursor-pointer`}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -246,7 +250,7 @@ Please let me know availability and details. Thank you!`;
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="absolute top-20 sm:top-24 left-0 w-full bg-charcoal-light border-b border-white/5 p-6 flex flex-col gap-4 md:hidden shadow-2xl z-50"
+              className={`absolute top-20 sm:top-24 left-0 w-full bg-charcoal-light border-b border-white/5 p-6 flex flex-col gap-4 ${isMobileMode ? 'flex' : 'md:hidden'} shadow-2xl z-50`}
             >
               <div className="flex items-center gap-4 pb-4 border-b border-white/10">
                 <div className="w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-amber-400/50 via-violet-royal to-amber-200/50 border border-amber-300/40 overflow-hidden flex-shrink-0 shadow-lg">
