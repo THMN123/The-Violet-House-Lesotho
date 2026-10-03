@@ -7,7 +7,7 @@ import React from 'react';
 import { SecretPasscodeModal } from './components/SecretPasscodeModal';
 import { AdminDashboard } from './components/AdminDashboard';
 import { LandingPageView } from './components/LandingPageView';
-import { getLocalContent, SiteContent } from './lib/contentStore';
+import { getLocalContent, fetchGlobalContent, SiteContent } from './lib/contentStore';
 
 export default function App() {
   const [content, setContent] = React.useState<SiteContent>(() => getLocalContent());
@@ -18,6 +18,15 @@ export default function App() {
     return path === '/admin' || path === '/admin/' || hash === '#admin' || hash === '#/admin';
   });
   const [isPasscodeModalOpen, setIsPasscodeModalOpen] = React.useState(false);
+
+  // Fetch global server content on mount so all visitors receive latest updates immediately
+  React.useEffect(() => {
+    fetchGlobalContent().then((data) => {
+      if (data) {
+        setContent(data);
+      }
+    });
+  }, []);
 
   // Listen to browser navigation (back/forward, URL hash)
   React.useEffect(() => {

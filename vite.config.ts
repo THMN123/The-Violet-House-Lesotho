@@ -13,28 +13,58 @@ export default defineConfig(({mode}) => {
       {
         name: 'content-saver',
         configureServer(server) {
-          server.middlewares.use('/api/save-content', (req, res) => {
-            if (req.method === 'POST') {
-              let body = '';
-              req.on('data', (chunk) => {
-                body += chunk;
-              });
-              req.on('end', () => {
+          server.middlewares.use((req, res, next) => {
+            const url = req.url || '';
+            const targetPath = path.resolve(__dirname, 'src/data/content.json');
+
+            if (url === '/api/content' || url.startsWith('/api/content?') || url === '/api/save-content') {
+              if (req.method === 'GET') {
                 try {
-                  const data = JSON.parse(body);
-                  const targetPath = path.resolve(__dirname, 'src/data/content.json');
-                  fs.writeFileSync(targetPath, JSON.stringify(data, null, 2), 'utf-8');
-                  res.writeHead(200, { 'Content-Type': 'application/json' });
-                  res.end(JSON.stringify({ success: true }));
-                } catch (e: unknown) {
-                  res.writeHead(500, { 'Content-Type': 'application/json' });
-                  res.end(JSON.stringify({ success: false, error: String(e) }));
+                  if (fs.existsSync(targetPath)) {
+                    const fileData = fs.readFileSync(targetPath, 'utf-8');
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+                    res.end(fileData);
+                    return;
+                  }
+                } catch (e) {
+                  console.error('Error reading content.json:', e);
                 }
-              });
-            } else {
-              res.writeHead(405, { 'Content-Type': 'application/json' });
+                res.statusCode = 404;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({ error: 'Content file not found' }));
+                return;
+              }
+
+              if (req.method === 'POST') {
+                let body = '';
+                req.on('data', (chunk) => {
+                  body += chunk;
+                });
+                req.on('end', () => {
+                  try {
+                    const data = JSON.parse(body);
+                    fs.writeFileSync(targetPath, JSON.stringify(data, null, 2), 'utf-8');
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify({ success: true }));
+                  } catch (e: unknown) {
+                    res.statusCode = 500;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify({ success: false, error: String(e) }));
+                  }
+                });
+                return;
+              }
+
+              res.statusCode = 405;
+              res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({ error: 'Method Not Allowed' }));
+              return;
             }
+
+            next();
           });
         },
       },

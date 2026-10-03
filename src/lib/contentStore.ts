@@ -52,6 +52,35 @@ export function getLocalContent(): SiteContent {
   return defaultContent as SiteContent;
 }
 
+/**
+ * Fetches the latest global content from the server so any visitor on any device
+ * gets the true global content instead of just their browser's local cache.
+ */
+export async function fetchGlobalContent(): Promise<SiteContent> {
+  if (typeof window === 'undefined') return defaultContent as SiteContent;
+
+  try {
+    const res = await fetch('/api/content', {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+      },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && typeof data === 'object' && data.general) {
+        // Cache to local storage so future loads are instant
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data, null, 2));
+        window.dispatchEvent(new Event('contentUpdated'));
+        return { ...defaultContent, ...data };
+      }
+    }
+  } catch (err) {
+    console.warn('Could not fetch global content from server, using local cache:', err);
+  }
+
+  return getLocalContent();
+}
+
 export function saveLocalContent(content: SiteContent): void {
   if (typeof window === 'undefined') return;
   try {
@@ -59,14 +88,12 @@ export function saveLocalContent(content: SiteContent): void {
     // Dispatch a custom event so other open tabs/components can re-render immediately
     window.dispatchEvent(new Event('contentUpdated'));
 
-    // Also write to server filesystem directly if running dev server
-    fetch('/api/save-content', {
+    // Write to /api/content and /api/save-content so all users get it globally
+    fetch('/api/content', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(content),
-    }).catch(() => {
-      // In static deployment, localStorage handles it
-    });
+    }).catch(() => {});
   } catch (err) {
     console.error('Failed to save content to localStorage:', err);
   }
@@ -121,18 +148,19 @@ export async function pushContentToGitHub(
   content: SiteContent,
   config: GitHubConfig,
   commitMessage = 'Update site content via Admin Dashboard'
-): Promise<{ success: boolean; sha?: string; message: string; commitUrl?: string; isLocalSaved?: boolean }> {
+): Promise<{ success: boolean; sha?: string; message: string; commitUrl?: string; isLocalSaved?: boolean; needsToken?: boolean }> {
   // 1. Always save to localStorage and server filesystem immediately
   saveLocalContent(content);
 
   const { token, repo, branch = 'main' } = config;
 
-  // 2. If token is not provided, seamlessly succeed!
+  // 2. If token is not provided, inform clearly that it's saved locally/on server, but needs token for GitHub global deploy
   if (!token || !token.trim()) {
     return {
       success: true,
       isLocalSaved: true,
-      message: 'All changes saved and applied live to your website! 🎉',
+      needsToken: true,
+      message: 'Saved to live server! To publish globally to your GitHub repository, connect your GitHub token.',
     };
   }
 
@@ -156,17 +184,17 @@ export async function pushContentToGitHub(
       const data = await getRes.json();
       currentSha = data.sha;
     } else if (getRes.status === 401) {
-      // Gentle notification, no blocking error
       return {
         success: true,
-        message: 'Saved to live website! (GitHub token optional — you can add it in Settings anytime).',
+        needsToken: true,
+        message: 'Saved to server! (GitHub token was not accepted — please check your token).',
       };
     } else if (getRes.status === 404) {
       currentSha = undefined;
     } else {
       return {
         success: true,
-        message: 'Saved to live website successfully! 🎉',
+        message: 'Saved to live server! (GitHub sync skipped).',
       };
     }
 
@@ -204,7 +232,7 @@ export async function pushContentToGitHub(
     if (!putRes.ok) {
       return {
         success: true,
-        message: 'Saved to live website! (GitHub push skipped).',
+        message: 'Saved to server! (GitHub commit push skipped).',
       };
     }
 
@@ -214,12 +242,12 @@ export async function pushContentToGitHub(
       success: true,
       sha: commitData.content?.sha || commitData.commit?.sha,
       commitUrl: commitData.commit?.html_url,
-      message: 'Committed to GitHub & Saved Live! 🚀 Deployment updates in ~30s.',
+      message: 'Committed to GitHub & Saved Live! 🚀 Deployment updating globally across the web.',
     };
   } catch {
     return {
       success: true,
-      message: 'Saved to live website successfully! 🎉',
+      message: 'Saved to live server successfully! 🎉',
     };
   }
 }

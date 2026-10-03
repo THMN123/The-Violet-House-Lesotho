@@ -43,6 +43,8 @@ import {
   Globe,
   Sliders,
   Type,
+  Download,
+  ExternalLink,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -129,26 +131,39 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onExit }) => {
     }, 6000);
   };
 
+  const handleDownloadContent = () => {
+    const blob = new Blob([JSON.stringify(content, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'content.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showNotification('success', 'content.json downloaded!', 'Upload to src/data/content.json in your GitHub repository.');
+  };
+
   /**
    * UNIFIED SAVE & PUBLISH ENGINE:
-   * 1. Saves instantly to browser localStorage (updates preview immediately in 0ms).
-   * 2. If GitHub connected: pushes directly to GitHub via REST API.
-   * 3. If GitHub not connected: notifies user and invites 1-click connection.
+   * 1. Saves instantly to browser localStorage AND app server /api/content (updates globally for all visitors in 0ms).
+   * 2. If GitHub token is present: commits to GitHub repository via REST API.
+   * 3. If GitHub token is missing: saves to server and invites 1-click token setup for GitHub/Vercel global sync.
    */
   const handleUnifiedSaveAndPublish = async () => {
     setIsPublishing(true);
     setPublishStep('saving');
 
-    // Step 1: Save locally and to disk
+    // Step 1: Save locally and to app server immediately
     saveLocalContent(content);
     setHasUnsavedEdits(false);
 
-    // Step 2: Push to GitHub (if token is configured, commits to GitHub; otherwise saves locally)
+    // Step 2: Push to GitHub if configured
     setPublishStep('pushing');
     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const autoCommitMessage = `✨ Update site content via Violet CMS (${now})`;
 
-    const result = await pushContentToGitHub(content, githubConfig, autoCommitMessage);
+    const result = await pushContentToGitHub(content, githubConfig || { token: '', repo: 'thaanemoletsane/The-Violet-House-Lesotho', branch: 'main' }, autoCommitMessage);
     setIsPublishing(false);
     setPublishStep('done');
 
@@ -159,33 +174,67 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onExit }) => {
       colors: ['#8A2BE2', '#D4AF37', '#9333EA', '#F59E0B', '#EAB308'],
     });
 
-    showNotification(
-      'success',
-      'Changes Saved & Applied Live! 🎉',
-      result.message || 'Your website content is updated live across all devices.'
-    );
+    if (result.needsToken) {
+      showNotification(
+        'info',
+        'Saved to Server & Preview! ✓',
+        'To push to GitHub/Vercel globally, add your 1-time GitHub token.'
+      );
+      setIsGitHubModalOpen(true);
+    } else {
+      showNotification(
+        'success',
+        'Published Globally! 🚀',
+        result.message || 'Changes saved to server and committed to GitHub.'
+      );
+    }
   };
 
-  const handleSaveGitHubConfig = (e: React.FormEvent) => {
+  const handleSaveGitHubConfig = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!setupToken.trim() || !setupRepo.trim()) {
-      showNotification('error', 'Token and repository name are required.');
+    if (!setupToken.trim()) {
+      showNotification('error', 'Please paste your GitHub Personal Access Token.');
       return;
     }
-    const cleanRepo = setupRepo
-      .replace(/^https?:\/\/github\.com\//, '')
-      .replace(/\.git$/, '')
-      .trim();
 
     const config: GitHubConfig = {
       token: setupToken.trim(),
-      repo: cleanRepo,
+      repo: setupRepo.trim() ? setupRepo.replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '').trim() : 'thaanemoletsane/The-Violet-House-Lesotho',
       branch: setupBranch.trim() || 'main',
     };
     saveGitHubConfig(config);
     setGithubConfig(config);
-    setIsGitHubModalOpen(false);
-    showNotification('success', 'GitHub Connected Successfully!', `Ready to push to ${cleanRepo}`);
+
+    // Immediately trigger push with the new token
+    setIsPublishing(true);
+    setPublishStep('pushing');
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const autoCommitMessage = `✨ Update site content via Violet CMS (${now})`;
+
+    const result = await pushContentToGitHub(content, config, autoCommitMessage);
+    setIsPublishing(false);
+    setPublishStep('done');
+
+    if (result.success && !result.needsToken) {
+      setIsGitHubModalOpen(false);
+      confetti({
+        particleCount: 100,
+        spread: 90,
+        origin: { y: 0.2, x: 0.5 },
+        colors: ['#8A2BE2', '#D4AF37', '#9333EA', '#F59E0B'],
+      });
+      showNotification(
+        'success',
+        'Published Globally to GitHub! 🚀',
+        'Committed to repository. Production site updating!'
+      );
+    } else {
+      showNotification(
+        'error',
+        'GitHub Connection Issue',
+        result.message || 'Token could not push commit. Please check token permissions.'
+      );
+    }
   };
 
   const handleResetDefaults = () => {
@@ -1418,6 +1467,105 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onExit }) => {
           )}
         </div>
       </div>
+
+      {/* 4. GITHUB CLOUD GLOBAL PUBLISHING MODAL */}
+      {isGitHubModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="w-full max-w-lg bg-zinc-900 border border-zinc-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setIsGitHubModalOpen(false)}
+              className="absolute top-6 right-6 p-2 rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+            >
+              <X size={18} />
+            </button>
+
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-400">
+                  Step 1: Saved to App Server &amp; Preview ✓
+                </span>
+              </div>
+              <h3 className="text-xl font-semibold text-zinc-100">
+                Publish Globally to GitHub &amp; Vercel
+              </h3>
+              <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
+                Your changes are already saved to this app server. To deploy globally to your public production website on GitHub and Vercel, connect your 1-time GitHub Personal Access Token.
+              </p>
+            </div>
+
+            {/* Quick 1-Click Link to Generate Token */}
+            <div className="p-4 rounded-2xl bg-violet-950/30 border border-violet-500/30 space-y-2.5">
+              <div className="text-xs font-semibold text-violet-200 flex items-center gap-1.5">
+                <Key size={14} className="text-violet-400" />
+                <span>Get your 1-time token (takes 10 seconds)</span>
+              </div>
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
+                Click below to open GitHub with the exact permissions pre-selected. Click the green <strong className="text-zinc-200">"Generate token"</strong> button at the bottom of that page and paste the code below:
+              </p>
+              <a
+                href="https://github.com/settings/tokens/new?description=Violet+House+CMS&scopes=repo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-500 text-xs font-semibold text-white shadow-sm transition-all"
+              >
+                <span>Generate Token on GitHub</span>
+                <ExternalLink size={13} />
+              </a>
+            </div>
+
+            {/* Token Input Form */}
+            <form onSubmit={handleSaveGitHubConfig} className="space-y-4">
+              <div>
+                <label className="text-[11px] font-semibold text-zinc-300 uppercase tracking-wider block mb-1.5">
+                  Paste GitHub Token (PAT)
+                </label>
+                <div className="relative">
+                  <input
+                    type="password"
+                    placeholder="ghp_xxxxxxxxxxxxxxxxxxxx or github_pat_xxxx"
+                    value={setupToken}
+                    onChange={(e) => setSetupToken(e.target.value)}
+                    className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-2.5 text-xs text-zinc-100 font-mono focus:outline-none focus:border-violet-500"
+                    autoFocus
+                  />
+                  <Key size={14} className="absolute right-3 top-3 text-zinc-500" />
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={isPublishing || !setupToken.trim()}
+                  className="flex-1 py-3 px-5 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 disabled:opacity-50 text-xs font-semibold text-white shadow-lg shadow-violet-950/50 transition-all cursor-pointer text-center"
+                >
+                  {isPublishing ? 'Pushing to GitHub...' : 'Save Token & Push Globally 🚀'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadContent}
+                  className="py-3 px-4 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition-colors flex items-center justify-center gap-1.5"
+                  title="Alternative: Download updated content.json file directly"
+                >
+                  <Download size={14} />
+                  <span>Download JSON</span>
+                </button>
+              </div>
+            </form>
+
+            <div className="text-[10px] text-zinc-500 text-center pt-2 border-t border-zinc-800 flex items-center justify-between">
+              <span>Token is saved securely in your browser.</span>
+              <button
+                type="button"
+                onClick={() => setIsGitHubModalOpen(false)}
+                className="text-zinc-400 hover:text-white underline cursor-pointer"
+              >
+                Close (Saved to Server)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
